@@ -1,91 +1,65 @@
+"use client"
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from './page.module.css'
+import Button from '@/components/Button';
+import { useState } from 'react';
+import LargeInput from '@/components/LargeInput';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const [ isFetching, setIsFetching ] = useState(false)
+  const [ fetchError, setFetchError ] = useState(false)
+  const [ variantImages, setVariantImages] = useState([])
+  const [ urlInputValue, setUrlInputValue] = useState('')
+  const [ lastSrcUrl, setLastSrcUrl] = useState('')
+
+  const generateVariants = async (imgUrl) => {
+    try{
+      setIsFetching(true)
+      const response = await fetch('/api/openai/images/generateVariants', { method: 'POST', body: JSON.stringify({ imgUrl }) });
+      const responseData = await response.json()
+      console.log('responseData', responseData)
+      setLastSrcUrl(imgUrl);
+      setVariantImages([...responseData.variantImages]);
+      setIsFetching(false)
+    } catch(e){
+      setLastSrcUrl('');
+      setFetchError(e)
+      setIsFetching(false)
+    }
+  }
+  const showVariantImages = variantImages?.length
+
+  const VariantImages = () => {
+    if(!showVariantImages) return null;
+    return (
+      <div className='flex'>
+        {variantImages.map(variantImage => <img className='mb-4 mr-2 rounded-lg' key={variantImage} src={variantImage.url} alt="Image variant" width={256} height={256} />)}
+      </div>
+    )
+  }
+
+  const GeneratePaintingButton = () => {
+    if(isFetching) return <Button>Generating...</Button>
+    return <Button onClick={() => generateVariants(urlInputValue)}>Generate P(ai)nting</Button>
+  }
+
+  const LastSrcImage = () => {
+    if(!lastSrcUrl) return null;
+    return <img className='mb-4 rounded-lg' src={lastSrcUrl} alt="Image Src" width={256} height={256} />
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.jsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className='flex flex-col justify-center items-center min-h-screen'>
+        <div className='text-3xl mb-4'>p(ai)nt</div>
+        <LastSrcImage />
+        <div className={`flex w-full justify-center ${isFetching ? 'cursor-progress' : ''}`}>
+          <LargeInput value={urlInputValue} setValue={setUrlInputValue} title="Input PNG Image URL" disabled={isFetching} />
+          <GeneratePaintingButton />
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+        <VariantImages />
     </main>
   )
 }
