@@ -7,6 +7,7 @@ P(ai)nt-it use openai's [DALL-E-2](https://openai.com/dall-e-2/) image variant s
 - Uses Tailwindcss/css
 
 ## TO-DO
+- Add drawable canvas to create images to send to DALL-E-2
 - Allow for image uploading
 - Generate additional generations of images easier
 
