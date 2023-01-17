@@ -1,4 +1,14 @@
-p(ai)nt is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) for the purpose of using openai's [DALL-E-2](https://openai.com/dall-e-2/) image variant system to generate new images based on a provided image URL.
+## About P(ai)nt-it
+P(ai)nt-it use openai's [DALL-E-2](https://openai.com/dall-e-2/) image variant system to generate new images based on a provided image URL.
+
+## Features
+- Submit PNG/JPG image URL and displays new variants of provided image
+- Type checks URL in /api route and passes buffer to openai (nothing is saved)
+- Uses Tailwindcss/css
+
+## TO-DO
+- Allow for image uploading
+- Generate additional generations of images easier
 
 ## Getting Started
 
